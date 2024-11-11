@@ -4,19 +4,21 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-family: Arial, sans-serif;
   border: none;
-  outline: none
+  outline: none;
 }
 
 html,
 body {
   width: 100%;
   height: 100%;
+  background-color: #121212;
+  color: white;
 }
 
 a {
-  color: black;
+  color: #000000;
   text-decoration: none;
   margin-right: 20px;
 }
@@ -25,16 +27,14 @@ a {
   display: none;
 }
 
-#root{
-  background-color: rgba(255, 224, 184, 0.523);
+#root {
+  background-color: #1e1e1e;
 }
 
 .App {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-
-
 }
 
 .content {
@@ -51,26 +51,25 @@ a {
 .second-container {
   width: 100%;
   height: 92vh;
+  background-color: #1e1e1e;
 }
 
 .content-home {
   position: absolute;
   top: 30%;
   left: 5%;
-
 }
 
 .content-home p {
   font-size: 42px;
   font-weight: 800;
-  color: rgb(0, 0, 0);
+  color: #ffffff;
   letter-spacing: 10px;
 }
 
 .content-home button {
-  background-color: white;
-  color: black;
-
+  background-color: #000000;
+  color: #ffffff;
 }
 
 .card-container,
@@ -97,7 +96,9 @@ a {
 
 .filter-container input,
 select {
-  border: 1px solid;
+  border: 1px solid #555;
+  background-color: #333;
+  color: white;
   padding: 10px;
   margin: 10px;
   border-radius: 5px;
@@ -105,13 +106,14 @@ select {
 
 .card,
 .card1 {
-  width: calc(33%-10px);
+  width: calc(33% - 10px);
   height: 40%;
+  background-color: #2e2e2e;
 }
 
 .read-more-link {
   cursor: pointer;
-  color: blue;
+  color: #9acd32;
   text-decoration: underline;
 }
 
@@ -120,35 +122,29 @@ select {
   width: 300px;
   height: 320px;
   position: relative;
-  border: 1px solid;
+  border: 1px solid #444;
   overflow: hidden;
 }
 
-/* Add this CSS to your styles */
 .description-container {
   width: 100%;
   overflow-x: auto;
-  /* Enable horizontal scroll if content overflows */
 }
 
 .description {
   white-space: nowrap;
-  /* Prevent text from wrapping */
   overflow: hidden;
-  /* Hide overflowing content */
   text-overflow: ellipsis;
-  /* Display ellipsis (...) for truncated text */
   padding: 5px;
-  /* Add padding for better visibility */
+  color: #ddd;
 }
-
 
 .card1 .desc {
   width: 100%;
   height: 100%;
-  width: 100%;
   transition: .5s;
   padding: 10px;
+  color: #ddd;
 }
 
 .card1:hover .desc {
@@ -164,7 +160,6 @@ select {
   height: 100%;
   background-image: url('../src/assets/Images/image.png');
   background-size: cover;
-
   transition: 1.9s;
   transform-origin: left;
   transform: perspective(2000px) rotateY(-90deg);
@@ -178,7 +173,7 @@ select {
 .card1 .details .center {
   padding: 20px;
   text-align: center;
-  background: #fff;
+  background: #333;
   position: absolute;
   top: 50%;
   left: 30%;
@@ -190,7 +185,7 @@ select {
 .card1 .details .center h1 {
   margin: 0;
   padding: 0;
-  color: #ff3636;
+  color: #9acd32;
   line-height: 20px;
   font-size: 25px;
   text-transform: uppercase;
@@ -198,13 +193,13 @@ select {
 
 .card1 .details .center h1 span {
   font-size: 14px;
-  color: #262626;
+  color: #ddd;
 }
 
 .card1 .details .center p {
   margin: 10px 0;
   padding: 0;
-  color: #262626;
+  color: #ddd;
 }
 
 .card1 .details .center ul {
@@ -227,11 +222,11 @@ select {
   height: 30px;
   line-height: 30px;
   text-align: center;
-  transform: .5s;
+  transition: .5s;
 }
 
 .card1 .details .center ul li a:hover {
-  background: #ff3636;
+  background: #9acd32;
 }
 
 .course-content {
@@ -239,35 +234,29 @@ select {
   padding: 20px;
   display: flex;
   flex-wrap: wrap;
+  color: #ddd;
 }
 
-.course-section {
+.course-section,
+.course-video {
   width: 50%;
   padding: 20px;
   box-sizing: border-box;
 }
 
-.course-video {
-  width: 50%;
-  padding: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-
 @media (min-width: 940px) {
   .card {
-    width: calc(25%-10px);
+    width: calc(25% - 10px);
   }
-
 }
 
 .certificate {
   width: 100%;
   padding: 20px;
-  border: 1px solid #000;
+  border: 1px solid #666;
   text-align: center;
+  background-color: #1e1e1e;
+  color: #ffffff;
 }
 
 .certificate h1 {
@@ -276,41 +265,19 @@ select {
   margin-bottom: 20px;
 }
 
-.certificate .content {
-  margin-bottom: 40px;
-}
-
-.certificate .content h2 {
-  font-size: 20px;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  font-weight: bold;
-}
-
-.certificate .content h3 {
-  font-size: 18px;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  font-weight: 700;
-}
-
+.certificate .content h2,
+.certificate .content h3,
 .certificate .content .date {
-  font-size: 16px;
   font-weight: bold;
-  margin-top: 10px;
-  margin-bottom: 20px;
 }
 
 @media (max-width: 768px) {
-  .course-section {
-    width: 100%;
-    /* Take full width on smaller screens */
-  }
-
+  .course-section,
   .course-video {
     width: 100%;
-    /* Take full width on smaller screens */
   }
 }
 
-
+.footer-text {
+  color: black;
+}

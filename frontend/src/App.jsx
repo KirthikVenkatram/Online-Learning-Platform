@@ -55,8 +55,8 @@ function App() {
             </Routes>
           </div>
           <footer className="bg-light text-center text-lg-start">
-            <div className="text-center p-3">
-              © {date} Copyright: Study App
+            <div className="text-center p-3 footer-text">
+              © {date} Copyright: Online Learning Platform 
             </div>
           </footer>
         </Router>
