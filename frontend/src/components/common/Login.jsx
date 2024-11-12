@@ -56,7 +56,7 @@ const Login = () => {
       <>
          <Navbar expand="lg" className="bg-body-tertiary">
             <Container fluid>
-               <Navbar.Brand><h2>Study App</h2></Navbar.Brand>
+               <Navbar.Brand><h2>Online Learning App</h2></Navbar.Brand>
                <Navbar.Toggle aria-controls="navbarScroll" />
                <Navbar.Collapse id="navbarScroll">
                   <Nav
