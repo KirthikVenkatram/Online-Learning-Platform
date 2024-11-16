@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Accordion, Modal } from 'react-bootstrap';
 import axiosInstance from '../../common/AxiosInstance';
 import ReactPlayer from 'react-player';
@@ -10,7 +10,7 @@ import { jsPDF } from "jspdf";
 import { Button } from '@mui/material';
 
 const CourseContent = () => {
-   const user = useContext(UserContext)
+   const user = useContext(UserContext);
 
    const { courseId, courseTitle } = useParams(); // Extract courseId from URL
    const [courseContent, setCourseContent] = useState([]);
@@ -19,7 +19,10 @@ const CourseContent = () => {
    const [completedSections, setCompletedSections] = useState([]);
    const [completedModule, setCompletedModule] = useState([]);
    const [showModal, setShowModal] = useState(false);
-   const [certificate, setCertificate] = useState(null)
+   const [certificate, setCertificate] = useState(null);
+   const [videoCompleted, setVideoCompleted] = useState(false); // Track video completion
+   const [statusMessage, setStatusMessage] = useState('');
+
    // Extract sectionIds from completedModule
    const completedModuleIds = completedModule.map((item) => item.sectionId);
 
@@ -33,20 +36,17 @@ const CourseContent = () => {
       });
    };
 
-
    const getCourseContent = async () => {
       try {
          const res = await axiosInstance.get(`/api/user/coursecontent/${courseId}`, {
             headers: {
-               "Authorization": `Bearer ${localStorage.getItem("token")}`
+               Authorization: `Bearer ${localStorage.getItem("token")}`
             }
          });
          if (res.data.success) {
             setCourseContent(res.data.courseContent);
-            console.log(res.data.completeModule)
-            setCompletedModule(res.data.completeModule)
-            // setCompletedModule(res.data.completeModule[0]?.progress);
-            setCertificate(res.data.certficateData.updatedAt)
+            setCompletedModule(res.data.completeModule);
+            setCertificate(res.data.certficateData?.updatedAt);
          }
       } catch (error) {
          console.log(error);
@@ -60,15 +60,14 @@ const CourseContent = () => {
    const playVideo = (videoPath, index) => {
       setCurrentVideo(videoPath);
       setPlayingSectionIndex(index);
+      setVideoCompleted(false); // Reset video completion state when a new video starts
+      setStatusMessage(''); // Reset status message
    };
 
    const completeModule = async (sectionId) => {
       if (completedModule.length < courseContent.length) {
-         // Mark the current section as completed
          if (playingSectionIndex !== -1 && !completedSections.includes(playingSectionIndex)) {
             setCompletedSections([...completedSections, playingSectionIndex]);
-
-            // Send a request to the server to update the user's progress
             try {
                const res = await axiosInstance.post(`api/user/completemodule`, {
                   courseId,
@@ -79,18 +78,21 @@ const CourseContent = () => {
                   }
                });
                if (res.data.success) {
-                  // Handle success if needed
                   alert(res.data.message);
-                  getCourseContent()
+                  getCourseContent();
                }
             } catch (error) {
                console.log(error);
             }
          }
       } else {
-         // Show the modal
          setShowModal(true);
       }
+   };
+
+   const handleVideoEnd = () => {
+      setVideoCompleted(true);
+      setStatusMessage('Video completed!');
    };
 
    return (
@@ -102,10 +104,7 @@ const CourseContent = () => {
             <div className="course-section">
                <Accordion defaultActiveKey="0" flush>
                   {courseContent.map((section, index) => {
-                     // Extract sectionId from the section
                      const sectionId = index;
-
-                     // Check if the sectionId is not in completedModuleIds
                      const isSectionCompleted = !completedModuleIds.includes(sectionId);
 
                      return (
@@ -115,7 +114,13 @@ const CourseContent = () => {
                               {section.S_description}
                               {section.S_content && (
                                  <>
-                                    <Button color='success' className='mx-2' variant="text" size="small" onClick={() => playVideo(`http://localhost:8000${section.S_content.path}`, index)}>
+                                    <Button
+                                       color='success'
+                                       className='mx-2'
+                                       variant="text"
+                                       size="small"
+                                       onClick={() => playVideo(section.S_content, index)}
+                                    >
                                        Play Video
                                     </Button>
                                     {isSectionCompleted && !completedSections.includes(index) && (
@@ -134,9 +139,6 @@ const CourseContent = () => {
                         </Accordion.Item>
                      );
                   })}
-                  {completedModule.length === courseContent.length && (
-                     <Button className='my-2' onClick={() => setShowModal(true)}>Download Certificate</Button>
-                  )}
                </Accordion>
             </div>
             <div className="course-video w-50">
@@ -146,11 +148,21 @@ const CourseContent = () => {
                      width='100%'
                      height='100%'
                      controls
+                     onEnded={handleVideoEnd} // Trigger video end event
                   />
                )}
             </div>
 
+            {videoCompleted && (
+               <div className="video-status">
+                  <p>{statusMessage}</p>
+                  <Button className='my-2' onClick={() => setShowModal(true)}>
+                     Download Certificate
+                  </Button>
+               </div>
+            )}
          </div>
+
          <Modal
             size="lg"
             show={showModal}
@@ -177,7 +189,6 @@ const CourseContent = () => {
                   </div>
                </div>
                <Button onClick={() => downloadPdfDocument('certificate-download')} style={{ float: 'right', marginTop: 3 }}>Download Certificate</Button>
-
             </Modal.Body>
          </Modal>
       </>
@@ -185,4 +196,3 @@ const CourseContent = () => {
 };
 
 export default CourseContent;
-

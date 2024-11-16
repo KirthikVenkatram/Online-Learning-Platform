@@ -35,7 +35,7 @@ const TeacherHome = () => {
    };
 
    const deleteCourse = async (courseId) => {
-      const confirmation = confirm('Are you sure you want to delete')
+      const confirmation = confirm('Are you sure you want to delete');
       if (!confirmation) {
          return;
       }
@@ -44,24 +44,23 @@ const TeacherHome = () => {
             headers: {
                Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
-         })
+         });
          if (res.data.success) {
-            alert(res.data.message)
-            getAllCoursesUser()
+            alert(res.data.message);
+            getAllCoursesUser();
          } else {
-            alert("Failed to delete the course")
+            alert('Failed to delete the course');
          }
       } catch (error) {
          console.log('An error occurred:', error);
       }
-   }
+   };
 
    return (
       <Container className='card-container'>
          {allCourses?.length > 0 ? (
             allCourses.map((course) => (
-               <Card key={course._id} className='card'>
-                  {/* <Card.Img variant='top' src='holder.js/100px180' /> */}
+               <Card key={course._id} className='card bg-dark text-white'>
                   <Card.Body>
                      <Card.Title>{course.C_title}</Card.Title>
                      <Card.Text>
@@ -74,6 +73,7 @@ const TeacherHome = () => {
                               <span
                                  className='read-more-link'
                                  onClick={() => toggleDescription(course._id)}
+                                 style={{ color: '#a9d4f5', cursor: 'pointer' }}
                               >
                                  {course.showFullDescription ? 'Read Less' : 'Read More'}
                               </span>
@@ -86,12 +86,14 @@ const TeacherHome = () => {
                         <p>
                            <strong>Sections: </strong> {course.sections.length}
                         </p>
-                        <p style={{color: '#c3b9b9'}}>
+                        <p>
                            <strong>Enrolled students: </strong> {course.enrolled}
                         </p>
                      </Card.Text>
-                     <div style={{float: 'right'}} className='d-flex'>
-                        <Button variant='primary' onClick={() => deleteCourse(course._id)}>Delete</Button>
+                     <div style={{ float: 'right' }} className='d-flex'>
+                        <Button variant='danger' onClick={() => deleteCourse(course._id)}>
+                           Delete
+                        </Button>
                      </div>
                   </Card.Body>
                </Card>

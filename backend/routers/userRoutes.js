@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const express = require("express");
 const multer = require("multer");
 
@@ -17,43 +19,44 @@ const {
 
 const router = express.Router();
 
+const uploadDir = path.join(__dirname, "../uploads");
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/");
+  destination: (req, file, cb) => {
+    cb(null, "./public/uploads");
   },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname);
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname);
   },
 });
 
-const upload = multer({
-  storage: storage,
-});
+// Setup Multer upload
+const upload = multer({ storage });
 
 router.post("/register", registerController);
-
 router.post("/login", loginController);
 
 router.post(
   "/addcourse",
   authMiddleware,
-  // upload.single('C_image'),
-  upload.array('S_content'),
+  upload.fields([
+    { name: "S_content", maxCount: 1 },
+    { name: "S_title", maxCount: 100 },
+    { name: "S_description", maxCount: 100 },
+  ]),
   postCourseController
 );
 
-router.get('/getallcourses', getAllCoursesController)
-
-router.get('/getallcoursesteacher', authMiddleware, getAllCoursesUserController)
-
-router.delete('/deletecourse/:courseid', authMiddleware, deleteCourseController)
-
-router.post('/enrolledcourse/:courseid', authMiddleware, enrolledCourseController)
-
-router.get('/coursecontent/:courseid', authMiddleware, sendCourseContentController)
-
-router.post('/completemodule', authMiddleware, completeSectionController)
-
-router.get('/getallcoursesuser', authMiddleware, sendAllCoursesUserController)
+router.get('/getallcourses', getAllCoursesController);
+router.get('/getallcoursesteacher', authMiddleware, getAllCoursesUserController);
+router.delete('/deletecourse/:courseid', authMiddleware, deleteCourseController);
+router.post('/enrolledcourse/:courseid', authMiddleware, enrolledCourseController);
+router.get('/coursecontent/:courseid', authMiddleware, sendCourseContentController);
+router.post('/completemodule', authMiddleware, completeSectionController);
+router.get('/getallcoursesuser', authMiddleware, sendAllCoursesUserController);
 
 module.exports = router;

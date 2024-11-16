@@ -1,5 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const multer = require("multer");
+const path = require('path');
 
 const userSchema = require("../schemas/userModel");
 const courseSchema = require("../schemas/courseModel");
@@ -87,37 +89,38 @@ const getAllCoursesController = async (req, res) => {
 ////////posting course////////////
 const postCourseController = async (req, res) => {
   try {
-    let price;
-    // Extract data from the request body and files
-    const {
-      userId,
-      C_educator,
-      C_title,
-      C_categories,
-      C_price,
-      C_description,
-      S_title,
-      S_description,
-    } = req.body;
-    const S_content = req.files.map((file) => file.filename); // Assuming you want to store the filenames in S_content
-    // Create an array of sections
-    const sections = [];
-    for (let i = 0; i < S_title.length; i++) {
-      sections.push({
-        S_title: S_title[i],
-        S_content: {
-          filename: S_content[i],
-          path: `/uploads/${S_content[i]}`,
-        },
-        S_description: S_description[i],
-      });
+    console.log("Request Body:", req.body);
+
+    const { userId, C_educator, C_title, C_categories, C_price, C_description, sections } = req.body;
+
+    if (
+      !userId ||
+      !C_educator ||
+      !C_title ||
+      !C_categories ||
+      !C_description ||
+      !Array.isArray(sections)
+    ) {
+      return res.status(400).send({ success: false, message: "Invalid input data" });
     }
-    if (C_price == 0) {
-      price = "free";
-    } else {
-      price = C_price;
-    }
-    // Create an instance of the course schema
+
+    // Validate each section
+    const formattedSections = sections.map((section) => {
+      if (!section.S_title || !section.S_description || !section.S_content) {
+        throw new Error("Incomplete section data");
+      }
+      if (!section.S_content.startsWith("https://www.youtube.com/")) {
+        throw new Error("Invalid YouTube link in section content");
+      }
+      return {
+        S_title: section.S_title,
+        S_description: section.S_description,
+        S_content: section.S_content, // YouTube link
+      };
+    });
+
+    const price = C_price == 0 ? "free" : C_price;
+
     const course = new courseSchema({
       userId,
       C_educator,
@@ -125,18 +128,14 @@ const postCourseController = async (req, res) => {
       C_categories,
       C_price: price,
       C_description,
-      sections,
+      sections: formattedSections,
     });
-    // Save the course instance to the database
+
     await course.save();
-    res
-      .status(201)
-      .send({ success: true, message: "Course created successfully" });
+    res.status(201).send({ success: true, message: "Course created successfully" });
   } catch (error) {
     console.error("Error creating course:", error);
-    res
-      .status(500)
-      .send({ success: false, message: "Failed to create course" });
+    res.status(500).send({ success: false, message: `Error: ${error.message}` });
   }
 };
 

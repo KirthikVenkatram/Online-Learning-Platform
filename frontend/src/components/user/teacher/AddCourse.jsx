@@ -32,7 +32,7 @@ const AddCourse = () => {
             {
                S_title: '',
                S_description: '',
-               S_content: null,
+               S_content: '',
             },
          ],
       });
@@ -41,12 +41,7 @@ const AddCourse = () => {
    const handleChangeSection = (index, e) => {
       const updatedSections = [...addCourse.sections];
       const sectionToUpdate = updatedSections[index];
-
-      if (e.target.name.endsWith('S_content')) {
-         sectionToUpdate.S_content = e.target.files[0];
-      } else {
-         sectionToUpdate[e.target.name] = e.target.value;
-      }
+      sectionToUpdate[e.target.name] = e.target.value;
 
       setAddCourse({ ...addCourse, sections: updatedSections });
    };
@@ -61,46 +56,28 @@ const AddCourse = () => {
    };
 
    const handleSubmit = async (e) => {
-      e.preventDefault()
-      const formData = new FormData();
-      Object.keys(addCourse).forEach((key) => {
-         if (key === 'sections') {
-            addCourse[key].forEach((section, index) => {
-               if (section.S_content instanceof File) {
-                  formData.append(`S_content`, section.S_content);
-               }
-               formData.append(`S_title`, section.S_title);
-               formData.append(`S_description`, section.S_description);
-            });
-         } else {
-            formData.append(key, addCourse[key]);
-         }
-      });
-
-      for (const [key, value] of formData.entries()) {
-         console.log(`${key}:`, value);
-      }
+      e.preventDefault();
 
       try {
-         const res = await axiosInstance.post('/api/user/addcourse', formData, {
+         const res = await axiosInstance.post('/api/user/addcourse', addCourse, {
             headers: {
                Authorization: `Bearer ${localStorage.getItem('token')}`,
-               'Content-Type': 'multipart/form-data',
             },
          });
 
-         if (res.status === 201) {
-            if (res.data.success) {
-               alert(res.data.message);
-            } else {
-               alert('Failed to create course');
-            }
+         if (res.status === 201 && res.data.success) {
+            alert(res.data.message);
          } else {
-            alert('Unexpected response status: ' + res.status);
+            alert(res.data.message || 'Failed to create course');
          }
       } catch (error) {
          console.error('An error occurred:', error);
-         alert('An error occurred while creating the course');
+         if (error.response) {
+            console.error('Server response:', error.response.data);
+            alert(`Error: ${error.response.data.message || 'Server error occurred'}`);
+         } else {
+            alert('An unexpected error occurred');
+         }
       }
    };
 
@@ -130,11 +107,11 @@ const AddCourse = () => {
                </Form.Group>
                <Form.Group as={Col} controlId="formGridTitle">
                   <Form.Label>Course Price(Rs.)</Form.Label>
-                  <Form.Control name='C_price' value={addCourse.C_price} onChange={handleChange} type="text" placeholder="for free course, enter 0" required />
+                  <Form.Control name='C_price' value={addCourse.C_price} onChange={handleChange} type="text" placeholder="For free course, enter 0" required />
                </Form.Group>
                <Form.Group as={Col} className="mb-3" controlId="formGridAddress2">
                   <Form.Label>Course Description</Form.Label>
-                  <Form.Control name='C_description' value={addCourse.C_description} onChange={handleChange} required as={"textarea"} placeholder="Enter Course description" />
+                  <Form.Control name='C_description' value={addCourse.C_description} onChange={handleChange} required as="textarea" placeholder="Enter Course Description" />
                </Form.Group>
             </Row>
 
@@ -151,7 +128,7 @@ const AddCourse = () => {
                      <Form.Group as={Col} controlId="formGridTitle">
                         <Form.Label>Section Title</Form.Label>
                         <Form.Control
-                           name={`S_title`}
+                           name="S_title"
                            value={section.S_title}
                            onChange={(e) => handleChangeSection(index, e)}
                            type="text"
@@ -160,12 +137,13 @@ const AddCourse = () => {
                         />
                      </Form.Group>
                      <Form.Group as={Col} controlId="formGridContent">
-                        <Form.Label>Section Content (Video or Image)</Form.Label>
+                        <Form.Label>Section Content (YouTube Link)</Form.Label>
                         <Form.Control
-                           name={`S_content`}
+                           name="S_content"
+                           value={section.S_content}
                            onChange={(e) => handleChangeSection(index, e)}
-                           type="file"
-                           accept="video/*,image/*"
+                           type="url"
+                           placeholder="Enter YouTube Video Link"
                            required
                         />
                      </Form.Group>
@@ -173,12 +151,12 @@ const AddCourse = () => {
                      <Form.Group className="mb-3" controlId="formGridAddress2">
                         <Form.Label>Section Description</Form.Label>
                         <Form.Control
-                           name={`S_description`}
+                           name="S_description"
                            value={section.S_description}
                            onChange={(e) => handleChangeSection(index, e)}
                            required
-                           as={"textarea"}
-                           placeholder="Enter Section description"
+                           as="textarea"
+                           placeholder="Enter Section Description"
                         />
                      </Form.Group>
                   </Row>
@@ -187,8 +165,8 @@ const AddCourse = () => {
 
             <Row className="mb-3">
                <Col xs={24} md={12} lg={8}>
-                  <Button size='sm' variant='outline-secondary' onClick={addInputGroup}>
-                     ➕Add Section
+                  <Button size="sm" variant="outline-secondary" onClick={addInputGroup}>
+                     ➕ Add Section
                   </Button>
                </Col>
             </Row>
