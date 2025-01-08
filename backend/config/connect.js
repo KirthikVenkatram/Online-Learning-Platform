@@ -3,7 +3,7 @@ require('dotenv').config();
 
 const connectionOfDb = () => {
   mongoose
-    .connect('mongodb://localhost:27017/olp', {
+    .connect('mongodb://127.0.0.1:27017/olp', {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     })
